@@ -7,14 +7,16 @@
 #include <cstdlib>
 #include <iostream>
 
+using namespace std;  // POSIX calls that clash with std names (bind) need :: prefix
+
 namespace {
 
 constexpr int kPort = 8080;
 constexpr int kBacklog = 128;  // macOS clamps this to kern.ipc.somaxconn
 
 [[noreturn]] void die(const char* what) {
-    std::perror(what);
-    std::exit(EXIT_FAILURE);
+    perror(what);
+    exit(EXIT_FAILURE);
 }
 
 }  // namespace
@@ -32,10 +34,10 @@ int main() {
     addr.sin_port = htons(kPort);
     addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
-    if (bind(listen_fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0) die("bind");
+    if (::bind(listen_fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0) die("bind");
     if (listen(listen_fd, kBacklog) < 0) die("listen");
 
-    std::cout << "listening on 127.0.0.1:" << kPort << std::endl;
+    cout << "listening on 127.0.0.1:" << kPort << endl;
 
     sockaddr_in client{};
     socklen_t client_len = sizeof(client);
@@ -44,7 +46,7 @@ int main() {
 
     char ip[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &client.sin_addr, ip, sizeof(ip));
-    std::cout << "client connected: " << ip << ':' << ntohs(client.sin_port) << std::endl;
+    cout << "client connected: " << ip << ':' << ntohs(client.sin_port) << endl;
 
     char buf[4096];
     ssize_t n;
@@ -53,7 +55,7 @@ int main() {
         if (send(client_fd, buf, static_cast<size_t>(n), 0) < 0) die("send");
     }
     if (n < 0) die("recv");
-    std::cout << "client disconnected" << std::endl;
+    cout << "client disconnected" << endl;
 
     close(client_fd);
     close(listen_fd);
