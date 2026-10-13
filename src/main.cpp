@@ -23,6 +23,10 @@ int main() {
     int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (listen_fd < 0) die("socket");
 
+    // Let bind() succeed while old connections on this port sit in TIME_WAIT.
+    int yes = 1;
+    if (setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0) die("setsockopt");
+
     sockaddr_in addr{};
     addr.sin_family = AF_INET;
     addr.sin_port = htons(kPort);
