@@ -6,6 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_executable(server src/main.cpp)
+add_executable(server src/main.cpp src/socket.cpp)
 target_include_directories(server PRIVATE include)
 target_compile_options(server PRIVATE -Wall -Wextra -Wpedantic)
